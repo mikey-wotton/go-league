@@ -16,3 +16,16 @@ const(
 	RegionJP Region = "jp"
 	RegionKR Region = "kr"
 )
+
+var regions = []Region{RegionEUW, RegionBR, RegionEUNE, RegionLAN, RegionNA, RegionOCE,
+	RegionRU, RegionTR, RegionJP, RegionKR}
+
+func (r Region) Valid() bool {
+	for _, region := range regions {
+		if region == r {
+			return true
+		}
+	}
+
+	return false
+}
