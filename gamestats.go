@@ -182,6 +182,22 @@ func (g *GameStats) GetActivePlayerSummonerName() SummonerName {
 	return g.ActivePlayer.SummonerName
 }
 
+func (g *GameStats) GetOpposingTeam() ([]GamePlayer, error) {
+	activeTeam, err := g.GetPlayersTeamName(g.ActivePlayer.SummonerName)
+	if err != nil {
+		return nil, err
+	}
+
+	opposingTeam := make([]GamePlayer, 0)
+	for _, player := range g.AllPlayers {
+		if player.Team != activeTeam {
+			opposingTeam = append(opposingTeam, player)
+		}
+	}
+
+	return opposingTeam, nil
+}
+
 func (g *GameStats) GetPlayersTeamName(summonerName SummonerName) (TeamName, error) {
 	for _, player := range g.AllPlayers {
 		if player.SummonerName == summonerName {
