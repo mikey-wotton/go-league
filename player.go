@@ -31,7 +31,7 @@ func newPlayer(gamer GamePlayer, drakeKills, baronKills int) *Player {
 	}
 }
 
-func newTeams(activePlayer SummonerName, activePlayerTeamName TeamName) *Match {
+func newMatch(activePlayer SummonerName, activePlayerTeamName TeamName) *Match {
 	return &Match{
 		ActivePlayerName: activePlayer,
 		ActiveTeam:       activePlayerTeamName,
@@ -46,7 +46,7 @@ func GetMatch(stats GameStats) (*Match, error) {
 		return nil, err
 	}
 
-	teams := newTeams(stats.ActivePlayer.SummonerName, activePlayerTeam)
+	match := newMatch(stats.ActivePlayer.SummonerName, activePlayerTeam)
 
 	drakeKills := getDrakeKills(stats)
 
@@ -55,15 +55,15 @@ func GetMatch(stats GameStats) (*Match, error) {
 	for _, player := range stats.AllPlayers {
 		switch player.Team {
 		case TeamNameChaos:
-			teams.Order = append(teams.Order, newPlayer(player, drakeKills, baronKills))
+			match.Chaos = append(match.Chaos, newPlayer(player, drakeKills, baronKills))
 		case TeamNameOrder:
-			teams.Chaos = append(teams.Chaos, newPlayer(player, drakeKills, baronKills))
+			match.Order = append(match.Order, newPlayer(player, drakeKills, baronKills))
 		default:
 			return nil, fmt.Errorf("unknown team name provided: %s", player.Team)
 		}
 	}
 
-	return teams, nil
+	return match, nil
 }
 
 func getDrakeKills(stats GameStats) int {
