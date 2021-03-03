@@ -30,17 +30,19 @@ func (m Match) AllPlayers(filterList ...SummonerName) []*Player {
 }
 
 func (m Match) ActivePlayerTeam(filterList ...SummonerName) []*Player {
-	all := make([]*Player, 0)
+	var all []*Player
 	switch m.ActiveTeam {
 	case TeamNameOrder:
+		all = make([]*Player, len(m.Order))
 		copy(all, m.Order)
 	case TeamNameChaos:
-		copy(all, m.Order)
+		all = make([]*Player, len(m.Chaos))
+		copy(all, m.Chaos)
 	default:
 		return nil
 	}
 
-	if len(filterList) >= 0 {
+	if len(filterList) > 0 {
 		all = filter(all, filterList)
 	}
 
@@ -70,22 +72,24 @@ func (t TeamName) OpposingTeam() (TeamName, error) {
 }
 
 func filter(all []*Player, filterList []SummonerName) []*Player {
+	if len(filterList) <= 0 {
+		return all
+	}
+
 	filtered := make([]*Player, 0, len(all))
 
-	if len(filterList) >= 0 {
-		for _, p := range all {
-			var allowed bool
+	for _, p := range all {
+		var allowed bool
 
-			for _, f := range filterList {
-				if p.SummonerName == f {
-					allowed = true
-					break
-				}
+		for _, f := range filterList {
+			if p.SummonerName == f {
+				allowed = true
+				break
 			}
+		}
 
-			if allowed {
-				filtered = append(filtered, p)
-			}
+		if allowed {
+			filtered = append(filtered, p)
 		}
 	}
 

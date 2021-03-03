@@ -13,7 +13,9 @@ const (
 
 func PollUntilGameStart() {
 	for {
-		<-time.Tick(pollingWaitTime)
+		ticker := time.NewTicker(pollingWaitTime)
+		<-ticker.C
+
 		_, err := GetLiveData()
 		if err == nil {
 			break
@@ -28,6 +30,7 @@ func PollUntilGameEndChannel() (chan *GameStats, chan error) {
 	go func() {
 		defer close(statsChan)
 		defer close(errChan)
+		ticker := time.NewTicker(time.Second * 15)
 
 		gameHasEnded := GameEndErrCounter()
 
@@ -49,7 +52,7 @@ func PollUntilGameEndChannel() (chan *GameStats, chan error) {
 				statsChan <- gameData
 			}
 
-			<-time.Tick(15 * time.Second)
+			<-ticker.C
 		}
 
 	}()

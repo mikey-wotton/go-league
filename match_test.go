@@ -100,3 +100,127 @@ func TestGameStats_IsSameTeam(t *testing.T) {
 		})
 	}
 }
+
+func TestMatch_ActivePlayerTeam(t *testing.T) {
+	tests := map[string]struct {
+		filterList []SummonerName
+		match Match
+
+		expTeam []*Player
+	}{
+		"ActivePlayer team is Order, returns entire team": {
+			match: Match{
+				ActivePlayerName: "mike",
+				ActiveTeam:       TeamNameOrder,
+				Order:            []*Player{
+					{
+						TeamName:     TeamNameOrder,
+						SummonerName: "bob",
+						ChampionName: ChampionNameEkko,
+					},
+					{
+						TeamName:     TeamNameOrder,
+						SummonerName: "mike",
+						ChampionName: ChampionNameYorick,
+					},
+				},
+				Chaos:            []*Player{
+					{
+						TeamName:     TeamNameChaos,
+						SummonerName: "steve",
+						ChampionName: ChampionNameYasuo,
+					},
+				},
+			},
+			expTeam: []*Player{
+				{
+					TeamName:     TeamNameOrder,
+					SummonerName: "bob",
+					ChampionName: ChampionNameEkko,
+				},
+				{
+					TeamName:     TeamNameOrder,
+					SummonerName: "mike",
+					ChampionName: ChampionNameYorick,
+				},
+			},
+		},
+		"ActivePlayer's team is chaos, returns only filtered players": {
+			filterList: []SummonerName{"mike"},
+			match: Match{
+				ActivePlayerName: "mike",
+				ActiveTeam:       TeamNameChaos,
+				Order:            []*Player{
+					{
+						TeamName:     TeamNameOrder,
+						SummonerName: "bob",
+						ChampionName: ChampionNameEkko,
+					},
+					{
+						TeamName:     TeamNameOrder,
+						SummonerName: "jerry",
+						ChampionName: ChampionNameEkko,
+					},
+				},
+				Chaos:            []*Player{
+					{
+						TeamName:     TeamNameChaos,
+						SummonerName: "steve",
+						ChampionName: ChampionNameYasuo,
+					},
+					{
+						TeamName:     TeamNameChaos,
+						SummonerName: "mike",
+						ChampionName: ChampionNameYasuo,
+					},
+				},
+			},
+			expTeam: []*Player{
+				{
+					TeamName:     TeamNameChaos,
+					SummonerName: "mike",
+					ChampionName: ChampionNameYasuo,
+				},
+			},
+		},
+		"No team returns nil": {
+			match: Match{
+				ActivePlayerName: "mike",
+				Order:            []*Player{
+					{
+						TeamName:     TeamNameOrder,
+						SummonerName: "bob",
+						ChampionName: ChampionNameEkko,
+					},
+					{
+						TeamName:     TeamNameOrder,
+						SummonerName: "jerry",
+						ChampionName: ChampionNameEkko,
+					},
+				},
+				Chaos:            []*Player{
+					{
+						TeamName:     TeamNameChaos,
+						SummonerName: "steve",
+						ChampionName: ChampionNameYasuo,
+					},
+					{
+						TeamName:     TeamNameChaos,
+						SummonerName: "mike",
+						ChampionName: ChampionNameYasuo,
+					},
+				},
+			},
+		},
+
+	}
+
+	for desc, test := range tests {
+		t.Run(desc, func(t *testing.T) {
+
+			team := test.match.ActivePlayerTeam(test.filterList...)
+
+			assert.Equal(t, test.expTeam, team)
+		})
+	}
+}
