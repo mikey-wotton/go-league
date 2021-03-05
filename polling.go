@@ -16,9 +16,12 @@ func PollUntilGameStart() {
 		ticker := time.NewTicker(pollingWaitTime)
 		<-ticker.C
 
-		_, err := GetLiveData()
+		game, err := GetLiveData()
 		if err == nil {
-			break
+			//sometimes the api's can come up but not be ready to respond with data so default values are set
+			if game.GameData.GameMode != GameModeUnknown {
+				break
+			}
 		}
 	}
 }
