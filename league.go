@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -31,10 +30,6 @@ func GetLiveData() (*GameStats, error) {
 	err = json.Unmarshal(bytes, &gd)
 	if err != nil {
 		return nil, err
-	}
-
-	if len(gd.AllPlayers) > 0 {
-		log.Println(gd.AllPlayers)
 	}
 
 	if err := gd.SetEvents(); err != nil {
